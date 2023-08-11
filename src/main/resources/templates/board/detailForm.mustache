@@ -1,0 +1,93 @@
+{{> /layout/header}}
+
+<div class="container p-5">
+
+    <!-- 돌아가기, 수정, 삭제버튼 -->
+    <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-start">
+            <a href="/" class="btn btn-secondary">돌아가기</a>
+        </div>
+
+        <!-- 수정 삭제 버튼 -->
+        {{#pageOwner}}
+        <div class="d-flex justify-content-end">
+            <!-- 수정은 수정페이지로 이동이기 때문에 get요청 또는 하이퍼링크 버튼으로 만들어도 된다 -->
+            <!-- 1. 버튼 -->
+            <form action="/board/{{dtos.0.boardId}}/updateForm" method="get"
+                enctype="application/x-www-form-urlencoded">
+                <input type="hidden" class="form-control" value="수정" name="수정">
+                <button type="submit" class="btn btn-success">수정</button>
+            </form>
+            <!--2. 버튼 -->
+            <!-- <a class="btn btn-success" href="/board/{{dtos.0.boardId}}/delete">수정</a> -->
+            <!-- ★★ 주석도 오류에 걸리니까 꼭 유의하자!!!!-->
+            <!-- 알겠지? -->
+            <form action="/board/{{dtos.0.boardId}}/delete" method="post" enctype="application/x-www-form-urlencoded">
+                <input type="hidden" class="form-control" value="삭제" name="삭제">
+                <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
+        </div>
+        {{/pageOwner}}
+    </div>
+
+    <!-- 게시글내용 -->
+    <div class="pt-1 d-flex justify-content-start">
+        <div class="card form-control">
+            <td>글 번호 : {{dtos.0.boardId}}</td>
+            <td>작성자 번호: {{dtos.0.boardUserId}}</td>
+            <div class="card-body">
+                <h3 class="card-title">{{dtos.0.boardTitle}}</h3>
+                </hr>
+                <p class="card-text">{{dtos.0.boardContent}}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 댓글내용 -->
+    <div class="card form-control">
+        <form action="/reply/save" method="post">
+            <!-- ★★JSON은 DTO로만 받을 수 있다. -->
+            <input type="hidden" name="boardId" value="{{dtos.0.boardId}}">
+            <!-- ★★ 댓글이 어떠한 게시글의 댓글인 지 boardId가 필요하다. -->
+            <div>
+                <textarea class="form-control" rows="1" placeholder="댓글 달기...." id="comment" name="comment"></textarea>
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <button type="submit" class="btn"><img width="24" height="24"
+                        src="https://img.icons8.com/material/24/filled-sent.png" alt="filled-sent" /></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 댓글리스트 -->
+
+    <div class="card">
+        <div class="card-header">댓글
+        </div>
+        {{#dtos}}
+        {{#replyId}}
+        <div class="card-padding card-footer d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column justify-content-start">
+                <p class="commnet-username mb-0">{{replyUserUsername}}</p>
+                <p class="mb-0">{{replyComment}}</p>
+                <!-- 댓글의 존재유무를 true/false로 하지 않으면, replyUserUsername의 key가 null이라서 No Key 오류가 뜬다. -->
+            </div>
+            {{#replyOwner}}
+            <!-- DTO에 있다.--> 
+            <div class="d-flex justify-content-end">
+                <form action="/reply/{{replyId}}/delete" method="post" enctype="application/x-www-form-urlencoded">
+                    <input type="hidden" class="form-control" value="{{boardId}}" name="boardId">
+                    <input type="hidden" class="form-control" value="{{replyUserId}}" name="replyUserId">
+                    <!-- ★★★ 댓글 삭제에서 해당 dtos 결과(replyId에 관련된)의 boardId와 replyUserId를 참조해야하므로, input된 value 값을 참조해야 한다. -->
+                    <!-- name과 value의 값과 댓글삭제 메소드의 매개변수가 참조하는 것이 일치해야 올바르게 값을 전송한다. -->
+                    <button type="submit" class="btn"><img width="24" height="24"
+                            src="https://img.icons8.com/material/24/waste--v1.png" alt="waste--v1" /></button>
+                </form>
+            </div>
+            {{/replyOwner}}
+        </div>
+        {{/replyId}}
+        {{/dtos}}
+    </div>
+</div>
+{{> /layout/footer}}
